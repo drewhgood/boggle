@@ -1,13 +1,16 @@
 const GRID_SIZE = 4;
-const GAME_DURATION = 180;
+const GAME_DURATION = 2;
 const GAME_INTERVAL = 1000;
 
 const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
 const ALPHABET_RANGE = [0, ALPHABET.length - 1];
 
-const GAME_BOARD_ID = 'board';
-const GAME_TIMER_ID = 'timer';
-const TILE_CLASS_NAME = 'tile';
+const ID_BOARD_GAME = 'board';
+const ID_GAME_TIMER = 'timer';
+
+const CLASS_NAME_GAME_TILE = 'tile';
+const CLASS_NAME_GAME_IN_PROGRESS = 'game--in-progress';
+const CLASS_NAME_GAME_OVER = 'game--over';
 
 const createDomElement = (content, elementType = 'DIV') => {
   const el = document.createElement(elementType);
@@ -15,38 +18,49 @@ const createDomElement = (content, elementType = 'DIV') => {
   return el;
 };
 
-const getRandomInteger = (min = ALPHABET_RANGE[0], max = ALPHABET_RANGE[1]) => {
+const getRandomIntegerInRange = (min = ALPHABET_RANGE[0], max = ALPHABET_RANGE[1]) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 class GameTimer {
-  constructor() {
-    this.timeRemaining = GAME_DURATION;
+  constructor(onTimeExpired) {
+    this.gameDuration = GAME_DURATION;
+    this.timeRemaining = this.gameDuration;
     this.gameInterval = GAME_INTERVAL;
-    this.timerEl = document.getElementById(GAME_TIMER_ID);
+    this.timerEl = document.getElementById(ID_GAME_TIMER);
+    this.onTimeExpired = onTimeExpired;
+    this.interval = undefined;
 
     this.renderTime();
   }
 
   start() {
-    this.gameInterval = GAME_INTERVAL;
-    setInterval(() => {
-      if (this.timeRemaining === 0) {
-        this.stop();
-      } else {
-        this.decrementTime();
-        this.renderTime();
-      }
-    }, this.gameInterval);
+    clearInterval(this.interval);
+    this.interval = setInterval(() => this.intervalTick(), this.gameInterval);
   }
 
   stop() {
-    this.gameInterval = 0;
+    clearInterval(this.interval);
   }
 
-  reset() {
-    this.timeRemaining = GAME_DURATION;
-    this.stop();
+  intervalTick() {
+    if (this.timeRemaining <= 0) {
+      this.stop();
+
+      if (this.onTimeExpired) {
+        console.log(this.onTimeExpired);
+        this.onTimeExpired();
+      }
+    } else {
+      this.decrementTime();
+      this.renderTime();
+    }
+  }
+
+  restart() {
+    clearInterval(this.interval);
+    this.timeRemaining = this.gameDuration;
+    this.renderTime();
   }
 
   formatTime() {
@@ -75,13 +89,19 @@ class GameBoard {
     this.tileCount = GRID_SIZE * GRID_SIZE;
     this.tileCharacters = this.getTileCharacters();
     this.tileElements = this.getTileElements();
-    this.gameBoardEl = document.getElementById(GAME_BOARD_ID);
+    this.gameBoardEl = document.getElementById(ID_BOARD_GAME);
+    this.addTilesToBoard();
+  }
+
+  restart() {
+    this.tileCharacters = this.getTileCharacters();
+    this.tileElements = this.getTileElements();
     this.addTilesToBoard();
   }
 
   getTileCharacters() {
     const randomCharacters = [...Array(this.tileCount)].map(() => {
-      const randomIndex = getRandomInteger();
+      const randomIndex = getRandomIntegerInRange();
       return ALPHABET[randomIndex];
     });
     return randomCharacters;
@@ -90,7 +110,7 @@ class GameBoard {
   getTileElements() {
     const tileElements = this.tileCharacters.map(character => {
       const element = createDomElement(character);
-      element.classList.add(TILE_CLASS_NAME);
+      element.classList.add(CLASS_NAME_GAME_TILE);
       element.style.width = '25%';
       element.style.height = '25%';
       return element;
@@ -99,6 +119,7 @@ class GameBoard {
   }
 
   addTilesToBoard() {
+    this.gameBoardEl.innerHTML = '';
     this.tileElements.forEach(tileEl => {
       this.gameBoardEl.appendChild(tileEl);
     });
@@ -107,27 +128,52 @@ class GameBoard {
 
 class GameSession {
   constructor() {
-    this.timer = new GameTimer();
+    this.timer = new GameTimer(() => this.stop());
     this.board = new GameBoard();
+    this.pageEl = document.body;
+    this.setUpButtons();
   }
 
   start() {
-    this.reset();
+    this.restart();
     this.timer.start();
+    this.addClassToPage(CLASS_NAME_GAME_IN_PROGRESS);
+  }
+
+  restart() {
+    this.timer.restart();
+    this.board.restart();
+    this.removeClassFromPage(CLASS_NAME_GAME_OVER);
+    this.removeClassFromPage(CLASS_NAME_GAME_IN_PROGRESS);
   }
 
   stop() {
     this.timer.stop();
+    this.addClassToPage(CLASS_NAME_GAME_OVER);
+    this.removeClassFromPage(CLASS_NAME_GAME_IN_PROGRESS);
   }
 
-  reset() {
-    this.timer.reset();
+  addClassToPage(className) {
+    this.pageEl.classList.add(className);
+  }
+
+  removeClassFromPage(className) {
+    this.pageEl.classList.remove(className);
+  }
+
+  setUpButtons() {
+    document.getElementById('button-start').addEventListener('click', () => {
+      this.start();
+    });
+
+    document.getElementById('button-restart').addEventListener('click', () => {
+      this.restart();
+    });
   }
 }
 
 const startGame = () => {
-  const game = new GameSession();
-  game.start();
+  new GameSession();
 };
 
 document.addEventListener('DOMContentLoaded', startGame);
