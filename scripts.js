@@ -1,6 +1,6 @@
 const GRID_SIZE = 4;
 const GAME_DURATION = 180;
-const GAME_INTERVAL = 1800;
+const GAME_INTERVAL = 1000;
 
 const ALPHABET = [...'abcdefghijklmnoprstuvwxyz', 'qu'];
 const ALPHABET_RANGE = [0, ALPHABET.length - 1];
@@ -148,7 +148,6 @@ class GameSession {
   }
 
   start() {
-    this.restart();
     this.timer.start();
     this.removeAllClasses();
     this.addClassToPage(CLASS_NAME_GAME_IN_PROGRESS);
