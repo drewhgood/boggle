@@ -2,7 +2,7 @@ const GRID_SIZE = 4;
 const GAME_DURATION = 180;
 const GAME_INTERVAL = 1000;
 
-const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
+const ALPHABET = [...'abcdefghijklmnoprstuvwxyz', 'qu'];
 const ALPHABET_RANGE = [0, ALPHABET.length - 1];
 
 const ID_BOARD_GAME = 'board';
