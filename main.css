@@ -14,6 +14,7 @@ html, body {
   background: #068df9;
   padding: 0.675rem;
   border-radius: 12px;
+  box-shadow: inset 3px 3px 9px #4a4a4a;
 }
 
 #timer {
@@ -28,11 +29,22 @@ html, body {
   justify-content: center;
 }
 
+button {
+  background: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  width: 11vw;
+  font-size: 2.5vw;
+  border: 1px solid black;
+}
+
 .game__buttons {
   display: flex;
   flex-direction: row;
-  width: 150px;
-  justify-content: space-between;
+  width: 25vw;
+  justify-content: space-evenly;
+  margin-top: 1rem;
 }
 
 .tile {
@@ -40,10 +52,11 @@ html, body {
   align-items: center;
   justify-content: center;
   background: white;
-  border: 1px solid black;
+  border: 5px solid #018df8;
   border-radius: 12px;
-  font-size: 8vw;
+  font-size: 6.5vw;
   text-transform: capitalize;
+  box-shadow: inset -3px 3px 3px #00000082;
 }
 
 #button-restart, #button-stop {
