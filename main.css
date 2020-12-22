@@ -52,11 +52,11 @@ button {
   align-items: center;
   justify-content: center;
   background: white;
-  border: 5px solid #018df8;
   border-radius: 12px;
   font-size: 6.5vw;
   text-transform: capitalize;
   box-shadow: inset -3px 3px 3px #00000082;
+  margin: 5px 5px;
 }
 
 #button-restart, #button-stop {
@@ -73,4 +73,8 @@ button {
 
 .game--stopped #button-restart {
   display: inline-block ;
+}
+
+.game--over #board {
+  background: #f44336;
 }

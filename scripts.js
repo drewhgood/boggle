@@ -1,6 +1,6 @@
 const GRID_SIZE = 4;
 const GAME_DURATION = 180;
-const GAME_INTERVAL = 1000;
+const GAME_INTERVAL = 1800;
 
 const ALPHABET = [...'abcdefghijklmnoprstuvwxyz', 'qu'];
 const ALPHABET_RANGE = [0, ALPHABET.length - 1];
@@ -12,6 +12,8 @@ const CLASS_NAME_GAME_TILE = 'tile';
 const CLASS_NAME_GAME_IN_PROGRESS = 'game--in-progress';
 const CLASS_NAME_GAME_OVER = 'game--over';
 const CLASS_NAME_GAME_STOPPED = 'game--stopped';
+
+const BEEP_SOUND = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU' + Array(1e3).join(123));
 
 const createDomElement = (content, elementType = 'DIV') => {
   const el = document.createElement(elementType);
@@ -31,6 +33,7 @@ class GameTimer {
     this.timerEl = document.getElementById(ID_GAME_TIMER);
     this.onTimeExpired = onTimeExpired;
     this.interval = undefined;
+    this.beepSound = BEEP_SOUND;
 
     this.renderTime();
   }
@@ -54,6 +57,10 @@ class GameTimer {
     } else {
       this.decrementTime();
       this.renderTime();
+
+      if (this.timeRemaining <= 5) {
+        this.beep();
+      }
     }
   }
 
@@ -82,11 +89,16 @@ class GameTimer {
   renderTime() {
     this.timerEl.innerHTML = this.formatTime();
   }
+
+  beep() {
+    this.beepSound.play();
+  }
 }
 
 class GameBoard {
   constructor() {
-    this.tileCount = GRID_SIZE * GRID_SIZE;
+    this.gridSize = GRID_SIZE;
+    this.tileCount = this.gridSize * this.gridSize;
     this.tileCharacters = this.getTileCharacters();
     this.tileElements = this.getTileElements();
     this.gameBoardEl = document.getElementById(ID_BOARD_GAME);
@@ -111,8 +123,9 @@ class GameBoard {
     const tileElements = this.tileCharacters.map(character => {
       const element = createDomElement(character);
       element.classList.add(CLASS_NAME_GAME_TILE);
-      element.style.width = '25%';
-      element.style.height = '25%';
+      const tilePercentSize = 100 / this.gridSize;
+      element.style.width = `calc(${tilePercentSize}% - 10px)`;
+      element.style.height = `calc(${tilePercentSize}% - 10px)`;
       return element;
     });
     return tileElements;
