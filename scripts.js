@@ -89,9 +89,13 @@ const formatTime = (timeInSeconds) => {
   return minutes + ':' + seconds;
 };
 
+const setTimerValue = (seconds) => {
+  GAME_TIMER_EL.innerHTML = formatTime(seconds);
+};
+
 const setUpGameTimer = () => {
   GAME_TIME_REMAINING = GAME_DURATION;
-  GAME_TIMER_EL.innerHTML = formatTime(GAME_DURATION);
+  setTimerValue(GAME_DURATION);
 };
 
 const startTimer = () => {
@@ -100,6 +104,7 @@ const startTimer = () => {
     GAME_TIMER_EL.innerHTML = formatTime(GAME_TIME_REMAINING);
   }, GAME_INTERVAL);
 };
+
 
 const startGame = () => {
   startTimer();
