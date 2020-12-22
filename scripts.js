@@ -1,5 +1,5 @@
 const GRID_SIZE = 4;
-const GAME_DURATION = 2;
+const GAME_DURATION = 180;
 const GAME_INTERVAL = 1000;
 
 const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
@@ -11,6 +11,7 @@ const ID_GAME_TIMER = 'timer';
 const CLASS_NAME_GAME_TILE = 'tile';
 const CLASS_NAME_GAME_IN_PROGRESS = 'game--in-progress';
 const CLASS_NAME_GAME_OVER = 'game--over';
+const CLASS_NAME_GAME_STOPPED = 'game--stopped';
 
 const createDomElement = (content, elementType = 'DIV') => {
   const el = document.createElement(elementType);
@@ -48,7 +49,6 @@ class GameTimer {
       this.stop();
 
       if (this.onTimeExpired) {
-        console.log(this.onTimeExpired);
         this.onTimeExpired();
       }
     } else {
@@ -128,7 +128,7 @@ class GameBoard {
 
 class GameSession {
   constructor() {
-    this.timer = new GameTimer(() => this.stop());
+    this.timer = new GameTimer(() => this.stop(true));
     this.board = new GameBoard();
     this.pageEl = document.body;
     this.setUpButtons();
@@ -137,19 +137,27 @@ class GameSession {
   start() {
     this.restart();
     this.timer.start();
+    this.removeAllClasses();
     this.addClassToPage(CLASS_NAME_GAME_IN_PROGRESS);
   }
 
   restart() {
     this.timer.restart();
     this.board.restart();
-    this.removeClassFromPage(CLASS_NAME_GAME_OVER);
-    this.removeClassFromPage(CLASS_NAME_GAME_IN_PROGRESS);
+    this.removeAllClasses();
   }
 
-  stop() {
+  stop(isGameOver) {
     this.timer.stop();
-    this.addClassToPage(CLASS_NAME_GAME_OVER);
+    this.removeAllClasses();
+
+    const className = isGameOver ? CLASS_NAME_GAME_OVER : CLASS_NAME_GAME_STOPPED;
+    this.addClassToPage(className);
+  }
+
+  removeAllClasses() {
+    this.removeClassFromPage(CLASS_NAME_GAME_STOPPED);
+    this.removeClassFromPage(CLASS_NAME_GAME_OVER);
     this.removeClassFromPage(CLASS_NAME_GAME_IN_PROGRESS);
   }
 
@@ -169,11 +177,11 @@ class GameSession {
     document.getElementById('button-restart').addEventListener('click', () => {
       this.restart();
     });
+
+    document.getElementById('button-stop').addEventListener('click', () => {
+      this.stop();
+    });
   }
 }
 
-const startGame = () => {
-  new GameSession();
-};
-
-document.addEventListener('DOMContentLoaded', startGame);
+document.addEventListener('DOMContentLoaded', () => new GameSession());

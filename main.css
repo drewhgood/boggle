@@ -15,3 +15,19 @@ html, body {
   align-items: center;
   justify-content: center;;
 }
+
+#button-restart, #button-stop {
+  display: none;
+}
+
+.game--in-progress #button-restart, .game--in-progress #button-stop {
+  display: inline-block;
+}
+
+.game--in-progress #button-start {
+  display: none;
+}
+
+.game--stopped #button-restart {
+  display: inline-block;
+}
