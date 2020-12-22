@@ -9,8 +9,8 @@ html, body {
 }
 
 #board {
-  width: 45vw;
-  height: 45vw;
+  width: 35vw;
+  height: 35vw;
   background: #068df9;
   padding: 0.675rem;
   border-radius: 12px;
